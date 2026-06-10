@@ -1,17 +1,14 @@
-name: PEF — Build Android & iOS
+name: PEF Build
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # تشغيل يدوي من GitHub
+  workflow_dispatch:
 
 jobs:
 
-  # ══════════════════════════════════════════
-  #  Android APK
-  # ══════════════════════════════════════════
   android:
-    name: Build Android APK
+    name: Android APK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,62 +18,46 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.44.0'
-          channel: stable
-          cache: true
-
-      - name: Flutter pub get
-        run: flutter pub get
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+          echo "$HOME/flutter/bin" >> $GITHUB_PATH
 
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          flutter pub get
+          flutter build apk --release
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: PEF-android
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
-  # ══════════════════════════════════════════
-  #  iOS IPA (macOS runner)
-  # ══════════════════════════════════════════
   ios:
-    name: Build iOS IPA
+    name: iOS IPA
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.44.0'
-          channel: stable
-          cache: true
-
-      - name: Flutter pub get
-        run: flutter pub get
-
-      - name: Pod install
+      - name: Install Flutter
         run: |
-          cd ios
-          pod install
-          cd ..
+          git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+          echo "$HOME/flutter/bin" >> $GITHUB_PATH
 
-      - name: Build iOS (unsigned)
-        run: flutter build ios --release --no-codesign
+      - name: Build iOS
+        run: |
+          flutter pub get
+          cd ios && pod install && cd ..
+          flutter build ios --release --no-codesign
 
       - name: Package IPA
         run: |
           mkdir -p build/ios/ipa/Payload
           cp -r build/ios/iphoneos/Runner.app build/ios/ipa/Payload/
-          cd build/ios/ipa
-          zip -r PEF.ipa Payload
-          cd ../../..
+          cd build/ios/ipa && zip -r PEF.ipa Payload
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: PEF-ios
           path: build/ios/ipa/PEF.ipa
