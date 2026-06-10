@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/profile_service.dart';
+import 'contracts_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String nationalId;
@@ -332,13 +333,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (!_loading && !_error)
+                        if (!_loading && !_error) ...[
+                          // زر العقود
+                          IconButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ContractsScreen(
+                                  nationalId: widget.nationalId,
+                                  employeeName: widget.employeeName,
+                                ),
+                              ),
+                            ),
+                            icon: const Icon(
+                                Icons.description_rounded,
+                                color: Colors.greenAccent,
+                                size: 22),
+                            tooltip: 'عقودي',
+                          ),
+                          // زر التعديل
                           IconButton(
                             onPressed: _enterEdit,
                             icon: const Icon(Icons.edit_rounded,
                                 color: Colors.white70, size: 20),
                             tooltip: 'تعديل',
                           ),
+                        ],
                         IconButton(
                           onPressed: _load,
                           icon: const Icon(Icons.refresh_rounded,
@@ -551,6 +571,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _F('JobPos',            _profile!.jobPos,      Icons.work_outlined),
               ],
             ),
+
+            // ── بطاقة العقود ──────────────────────────────
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ContractsScreen(
+                    nationalId: widget.nationalId,
+                    employeeName: widget.employeeName,
+                  ),
+                ),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1B5E20).withOpacity(0.3),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48, height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.description_rounded,
+                          color: Colors.white, size: 26),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('عقودي',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('عرض وتفاصيل العقود الوظيفية',
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded,
+                        color: Colors.white54, size: 16),
+                  ],
+                ),
+              ),
+            ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
           ],
         ),
       );

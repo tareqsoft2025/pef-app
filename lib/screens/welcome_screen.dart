@@ -14,6 +14,7 @@ import 'notifications_screen.dart';
 import 'task_screen.dart';
 import 'task_history_screen.dart';
 import 'profile_screen.dart';
+import 'leave_screen.dart';
 import 'login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -936,6 +937,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                       builder: (_) =>
                                           const NotificationsScreen()),
                                 ).then((_) => _loadNotifCount()),
+                              ),
+                              _FeatureCard(
+                                icon: Icons.beach_access_rounded,
+                                label: 'رصيد الإجازات',
+                                sublabel: '14 يوم سنوياً',
+                                color: const Color(0xFF00695C),
+                                bgColor: const Color(0xFFE0F2F1),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => LeaveScreen(
+                                      nationalId: widget.employeeId,
+                                      employeeName: widget.employeeName,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ).animate().fadeIn(delay: 300.ms),
